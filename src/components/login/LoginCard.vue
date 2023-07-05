@@ -45,7 +45,7 @@ export default {
 
             if (
               this.$route.name === "LoginView" ||
-              this.$route.fullPath === "/"
+              this.$route.fullPath === "/login"
             ) {
               const finalRoute = this.$route.query.redirect || "/home";
               this.$router.replace(finalRoute);
@@ -78,6 +78,13 @@ export default {
     async login() {
       await this.configureUser(this.username);
       this.$router.push({ name: "home" });
+    },
+    userUnsubscribe() {},
+    clearSessionTimeOut() {
+      if (this.timeOut) {
+        clearInterval(this.timeOut);
+        this.timeOut = null;
+      }
     },
   },
 };
