@@ -17,6 +17,8 @@
 
 <script>
 import { mapActions } from "vuex";
+import { Auth } from "@/firebase-exports";
+
 export default {
   data() {
     return {
@@ -41,16 +43,11 @@ export default {
             this.userUnsubscribe = await this.fetchUser();
             await new Promise((resolve) => setTimeout(resolve, 2000));
 
-            if (!this.$store.getters.isDemoEnv) {
-              updateNotifications();
-              updatePlan();
-            }
-
             if (
               this.$route.name === "LoginView" ||
               this.$route.fullPath === "/"
             ) {
-              const finalRoute = this.$route.query.redirect || "/dashboard";
+              const finalRoute = this.$route.query.redirect || "/home";
               this.$router.replace(finalRoute);
             }
           }
@@ -77,7 +74,7 @@ export default {
     });
   },
   methods: {
-    ...mapActions(["configureUser"]),
+    ...mapActions(["configureUser", "fetchUser", "logout"]),
     async login() {
       await this.configureUser(this.username);
       this.$router.push({ name: "home" });

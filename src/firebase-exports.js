@@ -25,6 +25,7 @@ const App = initializeApp(firebaseConfig);
 const Database = Firestore.getFirestore(App);
 // Initialize Firestore References
 const UsersCollection = Firestore.collection(Database, "users");
+const UsersDoc = (userId) => Firestore.doc(Database, "users", userId);
 
 export {
   Firebase,
@@ -36,4 +37,5 @@ export {
   Storage,
   Functions,
   UsersCollection,
+  UsersDoc,
 };
