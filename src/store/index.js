@@ -33,6 +33,11 @@ export default new Vuex.Store({
       const rol = await getUserRol();
       commit("setUser", { username: username, rol: rol });
     },
+    async logout() {
+      await Auth.signOut(Auth.getAuth());
+      router.replace("/login");
+    },
+    // FetchUser
     async fetchUser({ dispatch }) {
       try {
         const firebaseUser = await Auth.getAuth().currentUser;
@@ -57,7 +62,7 @@ export default new Vuex.Store({
                 await dispatch("fetchUser");
               }, expirationTimeout);
               if (!router.currentRoute.meta.userCanAccess()) {
-                router.push("/");
+                router.push("/login");
               }
             },
             (error) => {

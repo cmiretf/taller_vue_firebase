@@ -30,19 +30,26 @@ export default {
     Auth.onAuthStateChanged(Auth.getAuth(), async (user) => {
       if (user) {
         try {
+          // Establecemos el tiempo de autenticación
           const authTime =
             (await user.getIdTokenResult()).claims.auth_time * 1000;
+
+          // Establecemos el tiempo de sesion
           const sessionDuration = 1000 * 60 * 60 * 12; // 12 hour session
+
+          // En el caso de se expire la sesión llamamos a la función de expireSession de methods
           if (Date.now() > authTime + sessionDuration)
             await this.expireSession();
           else {
-            const remaining = authTime + sessionDuration - Date.now();
-            const twoHours = 1000 * 60 * 60 * 2;
-            this.setSessionTimeOut(remaining > twoHours ? remaining : twoHours);
+            // const remaining = authTime + sessionDuration - Date.now();
+            // const twoHours = 1000 * 60 * 60 * 2;
+            // this.setSessionTimeOut(remaining > twoHours ? remaining : twoHours);
 
+            // Suscripcion del usuario
             this.userUnsubscribe = await this.fetchUser();
             await new Promise((resolve) => setTimeout(resolve, 2000));
 
+            // En el caso de que este todo correcto, redirigimos al usuario a la pagina '/home'
             if (
               this.$route.name === "LoginView" ||
               this.$route.fullPath === "/login"
@@ -52,25 +59,14 @@ export default {
             }
           }
         } catch {
-          const message = this.$t("genericError");
-          this.setSnackbar({ position: "top", type: "error", message });
+          console.log(this.$t("genericError"));
 
           await new Promise((resolve) => setTimeout(resolve, 3000));
           this.logout();
         }
       } else {
         this.userUnsubscribe();
-        this.clearSessionTimeOut();
-        if (
-          this.$route.name !== "LoginView" &&
-          this.$route.name !== "SharedNotificationDetailView"
-        ) {
-          const currentPath = this.$route.fullPath;
-          const redirect = currentPath !== "/" ? currentPath : undefined;
-          this.$router.push({ name: "LoginView", query: { redirect } });
-        }
       }
-      this.waitingAuthUser = false;
     });
   },
   methods: {
@@ -80,12 +76,16 @@ export default {
       this.$router.push({ name: "home" });
     },
     userUnsubscribe() {},
-    clearSessionTimeOut() {
-      if (this.timeOut) {
-        clearInterval(this.timeOut);
-        this.timeOut = null;
-      }
+    async expireSession() {
+      await this.logout();
+      this.$router.push({ name: "LoginView" });
     },
+    // clearSessionTimeOut() {
+    //   if (this.timeOut) {
+    //     clearInterval(this.timeOut);
+    //     this.timeOut = null;
+    //   }
+    // },
   },
 };
 </script>
