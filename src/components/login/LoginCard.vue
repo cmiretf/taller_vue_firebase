@@ -22,9 +22,13 @@ import { Auth } from "@/firebase-exports";
 export default {
   data() {
     return {
+      authData: undefined,
       username: "",
       password: "",
     };
+  },
+  async mounted() {
+    this.authData = Auth.getAuth();
   },
   async beforeCreate() {
     Auth.onAuthStateChanged(Auth.getAuth(), async (user) => {
@@ -72,8 +76,18 @@ export default {
   methods: {
     ...mapActions(["configureUser", "fetchUser", "logout"]),
     async login() {
-      await this.configureUser(this.username);
-      this.$router.push({ name: "home" });
+      try {
+        const { user } = await Auth.signInWithEmailAndPassword(
+          this.authData,
+          this.username,
+          this.password
+        );
+        await this.configureUser(user);
+        this.$router.push({ name: "home" });
+        return user;
+      } catch (err) {
+        console.log(err);
+      }
     },
     userUnsubscribe() {},
     async expireSession() {

@@ -27,6 +27,14 @@ const Database = Firestore.getFirestore(App);
 const UsersCollection = Firestore.collection(Database, "users");
 const UsersDoc = (userId) => Firestore.doc(Database, "users", userId);
 
+// const VehiclesCollection = Firestore.collection(Database, "vehicles");
+// const VehiclesDoc = (vehicleId) => Firestore.doc(Database, "vehicles", vehicleId);
+
+const VehiclesCollection = (userId) =>
+  Firestore.collection(Database, "users", userId, "vehicles");
+const VehiclesDoc = (userId, vehicleId) =>
+  Firestore.doc(Database, "users", userId, "vehicles", vehicleId);
+
 export {
   Firebase,
   App,
@@ -38,4 +46,6 @@ export {
   Functions,
   UsersCollection,
   UsersDoc,
+  VehiclesCollection,
+  VehiclesDoc,
 };

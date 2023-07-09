@@ -1,6 +1,8 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import { getUserRol } from "@/services/users";
+import { vehiclesSubscription } from "@/services/vehiculos";
+
 import { Auth, Firestore, UsersDoc } from "@/firebase-exports";
 
 import router from "@/router";
@@ -27,11 +29,14 @@ export default new Vuex.Store({
     setUser(state, user) {
       state.user = user;
     },
+    setVehicles(state, vehicles) {
+      state.vehicles = vehicles;
+    },
   },
   actions: {
-    async configureUser({ commit }, username) {
+    async configureUser({ commit }, data) {
       const rol = await getUserRol();
-      commit("setUser", { username: username, rol: rol });
+      commit("setUser", { ...data, rol });
     },
     async logout() {
       await Auth.signOut(Auth.getAuth());
@@ -52,6 +57,8 @@ export default new Vuex.Store({
                 id: firebaseUser.uid,
               };
               dispatch("configureUser", firestoreCopy);
+
+              await vehiclesSubscription(firebaseUser.uid);
 
               firestoreUser.id = firebaseUser.uid;
               const tokenExpiration =

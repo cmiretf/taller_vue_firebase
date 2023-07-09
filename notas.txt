@@ -1,0 +1,23 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAddaliaUser(){
+      return request.auth.token.email.split("@")[1] == "addalia.com";
+    }
+    
+      allow get:    if true
+      allow list:   if true
+      allow create: if true
+      allow update: if true
+      allow delete: if true
+
+      match /subColeccion/{docId} {
+        allow get:    if true
+        allow list:   if true
+        allow create: if true
+        allow update: if true
+        allow delete: if true
+      }
+  }
+}
